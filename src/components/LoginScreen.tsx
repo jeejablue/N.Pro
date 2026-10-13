@@ -40,11 +40,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onDemoLogin }
 
         {/* Title */}
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
-            ระบบจัดการคลังสินค้า
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-semibold mb-2">
+            Professional Audio Warehouse
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            NPRO Audio
           </h1>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">
-            Warehouse & Inventory Management
+            ระบบจัดการคลังสินค้าเครื่องเสียงและบันทึกสต็อกบน Google Sheets
           </p>
         </div>
 

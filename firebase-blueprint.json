@@ -1,0 +1,85 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "NPRO Audio warehouse inventory item",
+      "type": "object",
+      "properties": {
+        "sku": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "current_stock": { "type": "number" },
+        "min_stock": { "type": "number" },
+        "unit": { "type": "string" },
+        "unit_price": { "type": "number" },
+        "unit_cost": { "type": "number" },
+        "location": { "type": "string" },
+        "barcode": { "type": "string" },
+        "image_url": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["sku", "name", "current_stock", "min_stock", "unit"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Stock In / Out movement record",
+      "type": "object",
+      "properties": {
+        "tx_id": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "type": { "type": "string", "enum": ["IN", "OUT"] },
+        "sku": { "type": "string" },
+        "product_name": { "type": "string" },
+        "quantity": { "type": "number" },
+        "unit": { "type": "string" },
+        "unit_price": { "type": "number" },
+        "total_amount": { "type": "number" },
+        "reference_no": { "type": "string" },
+        "operator_email": { "type": "string" },
+        "department": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["tx_id", "timestamp", "type", "sku", "quantity", "reference_no"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Audio equipment vendor / supplier",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "contact_person": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "notes": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Audio production / rental / client",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "contact_person": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "address": { "type": "string" },
+        "notes": { "type": "string" },
+        "updated_at": { "type": "string" }
+      },
+      "required": ["id", "name"]
+    }
+  },
+  "firestore": {
+    "collections": {
+      "products": { "entity": "Product" },
+      "transactions": { "entity": "Transaction" },
+      "suppliers": { "entity": "Supplier" },
+      "customers": { "entity": "Customer" }
+    }
+  }
+}

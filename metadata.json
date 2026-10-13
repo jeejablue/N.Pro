@@ -1,6 +1,6 @@
 {
   "name": "ระบบจัดการคลังสินค้า (Stock & Warehouse Management)",
-  "description": "ระบบบริหารจัดการคลังสินค้า บันทึกรับเข้า-เบิกจ่าย แจ้งเตือนสต็อกต่ำ และแดชบอร์ดสรุปภาพรวม เชื่อมต่อ Google Sheets และ Google Account",
+  "description": "ระบบจัดการคลังสินค้า NPRO Audio บริหารสต็อก บันทึกรับเข้า-เบิกจ่าย แจ้งเตือนสต็อกต่ำ เชื่อมต่อ Google Sheets และ Google Drive",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

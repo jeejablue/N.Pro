@@ -49,11 +49,16 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => setActiveTab('dashboard')}
             className="text-left cursor-pointer"
           >
-            <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight whitespace-nowrap block">
-              StockWarehouse
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight whitespace-nowrap block">
+                NPRO Audio
+              </span>
+              <span className="hidden sm:inline-block text-[10px] font-semibold px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                PRO WAREHOUSE
+              </span>
+            </div>
             <span className="hidden sm:block text-[10px] text-slate-500 dark:text-slate-400 font-medium">
-              Google Sheets Database
+              คลังสินค้าเครื่องเสียง &bull; Google Sheets
             </span>
           </button>
         </div>

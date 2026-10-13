@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { User } from 'firebase/auth';
 import {
+  User,
   initAuth,
   googleSignIn,
   logout,

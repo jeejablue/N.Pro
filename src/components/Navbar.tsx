@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from 'firebase/auth';
+import { User } from '../services/auth';
 import { SheetInfo } from '../types/warehouse';
 import { FileSpreadsheet, LogOut, Layers, RefreshCw, Folder, Sun, Moon } from 'lucide-react';
 

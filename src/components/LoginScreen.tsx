@@ -64,9 +64,16 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
         </div>
 
         {loginError && (
-          <div className="p-3 bg-red-950/80 border border-red-800/80 rounded-xl flex items-center gap-2 text-xs text-red-200 text-left">
-            <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-            <span>{loginError}</span>
+          <div className="p-3.5 bg-red-950/80 border border-red-800/80 rounded-2xl space-y-1.5 text-xs text-red-200 text-left animate-in fade-in">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+              <span className="font-semibold leading-relaxed">{loginError}</span>
+            </div>
+            {loginError.includes('unauthorized-domain') && (
+              <p className="text-[11px] text-red-300/90 pl-6 leading-relaxed">
+                ระบบได้สลับช่องทางยืนยันตัวตนไปยัง Google Identity Services (Direct OAuth) เรียบร้อยแล้ว กรุณากดปุ่มด้านล่างเพื่อเข้าสู่ระบบอีกครั้ง
+              </p>
+            )}
           </div>
         )}
 

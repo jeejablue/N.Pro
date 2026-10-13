@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Product, Transaction, Supplier } from '../types/warehouse';
-import { ArrowDownToLine, Camera, Check, Search, PlusCircle, Sparkles, Building2 } from 'lucide-react';
+import { ArrowDownToLine, Camera, Check, Search, PlusCircle, Sparkles, Building2, AlertTriangle } from 'lucide-react';
 import { BarcodeScannerModal } from './BarcodeScannerModal';
 import { ConfirmModal } from './ConfirmModal';
 import { ProductThumbnail } from './ProductThumbnail';
@@ -33,6 +33,7 @@ export const GoodsInView: React.FC<GoodsInViewProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // When prefilledSku changes
   useEffect(() => {
@@ -51,6 +52,7 @@ export const GoodsInView: React.FC<GoodsInViewProps> = ({
   const handleSelectProduct = (product: Product) => {
     setSelectedSku(product.sku);
     setSearchQuery('');
+    setErrorMessage(null);
     if (product.unit_cost) {
       setUnitCost(product.unit_cost);
     } else if (product.unit_price) {
@@ -70,21 +72,25 @@ export const GoodsInView: React.FC<GoodsInViewProps> = ({
       setSuccessToast(`พบสินค้า: ${match.name} (${match.sku})`);
       setTimeout(() => setSuccessToast(null), 3000);
     } else {
-      alert(`ไม่พบสินค้าที่มีรหัสบาร์โค้ด "${code}" ในระบบคลังสินค้า`);
+      setErrorMessage(`ไม่พบสินค้าที่มีรหัสบาร์โค้ด "${code}" ในระบบคลังสินค้า`);
+      setTimeout(() => setErrorMessage(null), 4000);
     }
   };
 
   const handleSubmitForm = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) {
-      alert('กรุณาเลือกสินค้าที่จะรับเข้า');
+      setErrorMessage('กรุณาเลือกสินค้าที่จะรับเข้า');
+      setTimeout(() => setErrorMessage(null), 3000);
       return;
     }
     if (!quantity || Number(quantity) <= 0) {
-      alert('กรุณาระบุจำนวนที่รับเข้ามากกว่า 0');
+      setErrorMessage('กรุณาระบุจำนวนที่รับเข้ามากกว่า 0');
+      setTimeout(() => setErrorMessage(null), 3000);
       return;
     }
 
+    setErrorMessage(null);
     // Trigger confirmation modal
     setShowConfirmModal(true);
   };
@@ -124,7 +130,8 @@ export const GoodsInView: React.FC<GoodsInViewProps> = ({
       setNotes('');
       if (onClearPrefill) onClearPrefill();
     } catch (err: any) {
-      alert(`เกิดข้อผิดพลาดในการบันทึก: ${err.message}`);
+      setErrorMessage(`เกิดข้อผิดพลาดในการบันทึก: ${err.message}`);
+      setTimeout(() => setErrorMessage(null), 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -171,6 +178,13 @@ export const GoodsInView: React.FC<GoodsInViewProps> = ({
         <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold text-emerald-800 dark:text-emerald-200 animate-in fade-in">
           <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>{successToast}</span>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-4 bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800/60 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold text-red-800 dark:text-red-200 animate-in fade-in">
+          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+          <span>{errorMessage}</span>
         </div>
       )}
 

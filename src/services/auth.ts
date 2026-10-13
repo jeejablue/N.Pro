@@ -80,11 +80,33 @@ export const loadGsiScript = (): Promise<boolean> => {
       resolve(true);
       return;
     }
+
+    // Polling fallback to check if script executes and defines google.accounts.oauth2
+    let attempts = 0;
+    const interval = setInterval(() => {
+      attempts++;
+      if (window.google?.accounts?.oauth2) {
+        clearInterval(interval);
+        resolve(true);
+        return;
+      }
+      if (attempts > 30) {
+        clearInterval(interval);
+        // If still not defined after 3 seconds, resolve false (fall back gracefully)
+        resolve(false);
+      }
+    }, 100);
+
     const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
     if (existingScript) {
-      existingScript.addEventListener('load', () => resolve(true));
-      existingScript.addEventListener('error', () => resolve(false));
-      if (window.google?.accounts?.oauth2) resolve(true);
+      existingScript.addEventListener('load', () => {
+        clearInterval(interval);
+        resolve(true);
+      });
+      existingScript.addEventListener('error', () => {
+        clearInterval(interval);
+        resolve(false);
+      });
       return;
     }
 
@@ -92,8 +114,14 @@ export const loadGsiScript = (): Promise<boolean> => {
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
+    script.onload = () => {
+      clearInterval(interval);
+      resolve(true);
+    };
+    script.onerror = () => {
+      clearInterval(interval);
+      resolve(false);
+    };
     document.head.appendChild(script);
   });
 };
@@ -201,9 +229,15 @@ const signInWithGis = async (clientId: string): Promise<{ user: WarehouseUser; a
             resolve({ user: fallbackUser, accessToken });
           }
         },
-        error_callback: (err) => {
-          console.error('GIS Error callback:', err);
-          reject(new Error('เกิดข้อผิดพลาดในการเชื่อมต่อ Google OAuth'));
+        error_callback: (err: any) => {
+          console.warn('GIS Error callback:', err);
+          if (err?.type === 'popup_closed' || String(err?.message || '').includes('closed')) {
+            reject(new Error('หน้าต่างล็อกอินถูกปิด กรุณาลองใหม่อีกครั้ง'));
+          } else if (err?.type === 'popup_blocked' || String(err?.message || '').includes('blocked')) {
+            reject(new Error('เบราว์เซอร์บล็อกหน้าต่าง Popup กรุณากดอนุญาตให้เปิด Popup สำหรับเว็บไซต์นี้'));
+          } else {
+            reject(new Error(err?.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ Google OAuth'));
+          }
         }
       });
 
@@ -295,6 +329,8 @@ export const googleSignIn = async (): Promise<{ user: WarehouseUser; accessToken
         if (
           gisError.message?.includes('user closed') ||
           gisError.message?.includes('popup_closed') ||
+          gisError.message?.includes('หน้าต่างล็อกอินถูกปิด') ||
+          gisError.message?.includes('บล็อก') ||
           gisError.message?.includes('ยกเลิก')
         ) {
           throw gisError;
@@ -329,13 +365,13 @@ export const googleSignIn = async (): Promise<{ user: WarehouseUser; accessToken
     if (error?.code === 'auth/unauthorized-domain' || error?.message?.includes('auth/unauthorized-domain')) {
       const currentHost = window.location.hostname;
       throw new Error(
-        `โดเมน ${currentHost} ยังไม่ได้เปิดสิทธิ์ใน Firebase (auth/unauthorized-domain) กำลังเปลี่ยนไปใช้ Google Direct Login กรุณากดลองอีกครั้ง`
+        `โดเมน ${currentHost} พบข้อจำกัด Firebase Auth (auth/unauthorized-domain) ระบบจะใช้ Google Direct Login กรุณากดใหม่อีกครั้ง`
       );
     }
-    if (error?.code === 'auth/popup-closed-by-user' || error?.message?.includes('popup-closed-by-user')) {
+    if (error?.code === 'auth/popup-closed-by-user' || error?.message?.includes('popup-closed-by-user') || error?.message?.includes('หน้าต่างล็อกอินถูกปิด')) {
       throw new Error('หน้าต่างล็อกอินถูกปิด กรุณาลองใหม่อีกครั้ง');
     }
-    if (error?.code === 'auth/popup-blocked' || error?.message?.includes('popup-blocked')) {
+    if (error?.code === 'auth/popup-blocked' || error?.message?.includes('popup-blocked') || error?.message?.includes('บล็อก')) {
       throw new Error('เบราว์เซอร์บล็อกหน้าต่าง Popup กรุณากดอนุญาตให้เปิด Popup สำหรับเว็บไซต์นี้');
     }
 
@@ -343,6 +379,18 @@ export const googleSignIn = async (): Promise<{ user: WarehouseUser; accessToken
   } finally {
     isSigningIn = false;
   }
+};
+
+export const createDemoSession = (): { user: WarehouseUser; accessToken: null } => {
+  const demoUser: WarehouseUser = {
+    uid: 'demo_operator',
+    email: 'operator@warehouse.demo',
+    displayName: 'ผู้ทดลองใช้งาน (Demo Operator)',
+    photoURL: null
+  };
+  cachedUser = demoUser;
+  cachedAccessToken = null;
+  return { user: demoUser, accessToken: null };
 };
 
 export const getAccessToken = async (): Promise<string | null> => {

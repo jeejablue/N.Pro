@@ -28,6 +28,7 @@ export const GoodsOutView: React.FC<GoodsOutViewProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const selectedProduct = products.find(p => p.sku === selectedSku);
   const currentStock = selectedProduct?.current_stock ?? 0;
@@ -40,6 +41,7 @@ export const GoodsOutView: React.FC<GoodsOutViewProps> = ({
   const handleSelectProduct = (product: Product) => {
     setSelectedSku(product.sku);
     setSearchQuery('');
+    setErrorMessage(null);
   };
 
   const handleScanCode = (code: string) => {
@@ -52,25 +54,30 @@ export const GoodsOutView: React.FC<GoodsOutViewProps> = ({
       setSuccessToast(`พบสินค้า: ${match.name} (คงเหลือ ${match.current_stock} ${match.unit})`);
       setTimeout(() => setSuccessToast(null), 3000);
     } else {
-      alert(`ไม่พบสินค้าที่มีรหัสบาร์โค้ด "${code}" ในระบบคลังสินค้า`);
+      setErrorMessage(`ไม่พบสินค้าที่มีรหัสบาร์โค้ด "${code}" ในระบบคลังสินค้า`);
+      setTimeout(() => setErrorMessage(null), 4000);
     }
   };
 
   const handleSubmitForm = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedProduct) {
-      alert('กรุณาเลือกสินค้าที่ต้องการเบิก');
+      setErrorMessage('กรุณาเลือกสินค้าที่ต้องการเบิก');
+      setTimeout(() => setErrorMessage(null), 3000);
       return;
     }
     if (!quantity || numQuantity <= 0) {
-      alert('กรุณาระบุจำนวนที่ต้องการเบิกมากกว่า 0');
+      setErrorMessage('กรุณาระบุจำนวนที่ต้องการเบิกมากกว่า 0');
+      setTimeout(() => setErrorMessage(null), 3000);
       return;
     }
     if (isOverStock) {
-      alert(`จำนวนที่ต้องการเบิก (${numQuantity}) เกินกว่ายอดคงเหลือในคลัง (${currentStock} ${selectedProduct.unit}) ไม่สามารถทำรายการได้`);
+      setErrorMessage(`จำนวนที่ต้องการเบิก (${numQuantity}) เกินกว่ายอดคงเหลือในคลัง (${currentStock} ${selectedProduct.unit}) ไม่สามารถทำรายการได้`);
+      setTimeout(() => setErrorMessage(null), 4000);
       return;
     }
 
+    setErrorMessage(null);
     setShowConfirmModal(true);
   };
 
@@ -107,7 +114,8 @@ export const GoodsOutView: React.FC<GoodsOutViewProps> = ({
       setReferenceNo('');
       setNotes('');
     } catch (err: any) {
-      alert(`เกิดข้อผิดพลาดในการบันทึก: ${err.message}`);
+      setErrorMessage(`เกิดข้อผิดพลาดในการบันทึก: ${err.message}`);
+      setTimeout(() => setErrorMessage(null), 5000);
     } finally {
       setIsSubmitting(false);
     }
@@ -154,6 +162,13 @@ export const GoodsOutView: React.FC<GoodsOutViewProps> = ({
         <div className="p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold text-emerald-800 dark:text-emerald-200 animate-in fade-in">
           <Check className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span>{successToast}</span>
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className="p-4 bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800/60 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold text-red-800 dark:text-red-200 animate-in fade-in">
+          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+          <span>{errorMessage}</span>
         </div>
       )}
 

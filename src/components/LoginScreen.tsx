@@ -3,9 +3,10 @@ import { Layers, FileSpreadsheet, ShieldCheck, Smartphone, AlertCircle } from 'l
 
 interface LoginScreenProps {
   onLogin: () => Promise<void>;
+  onDemoLogin?: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onDemoLogin }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -17,7 +18,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
     } catch (err: any) {
       console.error('Sign in failed:', err);
       setLoginError(
-        err?.message?.includes('popup-closed-by-user')
+        err?.message?.includes('popup-closed-by-user') || err?.message?.includes('หน้าต่างล็อกอินถูกปิด')
           ? 'หน้าต่างล็อกอินถูกปิด กรุณาลองใหม่อีกครั้ง'
           : err?.message || 'ไม่สามารถเข้าสู่ระบบด้วย Google ได้ กรุณาลองใหม่อีกครั้ง'
       );
@@ -104,6 +105,18 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           <p className="text-[11px] text-slate-500 mt-4 leading-relaxed">
             ระบบจะขอสิทธิ์เข้าถึง Google Sheets และ Drive เพื่อสร้างและอัปเดตฐานข้อมูลคลังสินค้าในบัญชีของคุณ
           </p>
+
+          {onDemoLogin && (
+            <div className="w-full pt-4 mt-2 border-t border-slate-800/80">
+              <button
+                type="button"
+                onClick={onDemoLogin}
+                className="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-850 text-slate-300 hover:text-white text-xs font-semibold rounded-2xl border border-slate-800 hover:border-slate-700 transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+              >
+                <span>ทดลองใช้งานระบบแบบไม่ต้องล็อกอิน (Demo Mode)</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

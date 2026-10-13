@@ -5,7 +5,8 @@ import {
   googleSignIn,
   logout,
   getAccessToken,
-  setAccessToken
+  setAccessToken,
+  createDemoSession
 } from './services/auth';
 import {
   GoogleSheetsService,
@@ -153,6 +154,13 @@ export default function App() {
     }
   };
 
+  // Handle Demo Mode (Local Testing)
+  const handleDemoLogin = () => {
+    const demo = createDemoSession();
+    setUser(demo.user);
+    setToken(null);
+  };
+
   // Handle Logout
   const handleLogout = async () => {
     await logout();
@@ -259,7 +267,7 @@ export default function App() {
         await GoogleSheetsService.recordTransaction(token, sheetInfo.spreadsheetId, newTx, updatedProducts);
       } catch (err: any) {
         console.error('Failed to sync transaction to Google Sheets:', err);
-        alert(`คำเตือน: บันทึกลงในระบบสำเร็จ แต่พบปัญหาการเขียนลง Google Sheet: ${err.message}`);
+        setDataError(`บันทึกข้อมูลในระบบสำเร็จ แต่พบปัญหาการเขียนลง Google Sheet: ${err.message}`);
       } finally {
         setIsSyncing(false);
       }
@@ -297,7 +305,7 @@ export default function App() {
         await GoogleSheetsService.recordTransaction(token, sheetInfo.spreadsheetId, newTx, updatedProducts);
       } catch (err: any) {
         console.error('Failed to sync transaction to Google Sheets:', err);
-        alert(`คำเตือน: บันทึกลงในระบบสำเร็จ แต่พบปัญหาการเขียนลง Google Sheet: ${err.message}`);
+        setDataError(`บันทึกข้อมูลในระบบสำเร็จ แต่พบปัญหาการเขียนลง Google Sheet: ${err.message}`);
       } finally {
         setIsSyncing(false);
       }
@@ -321,7 +329,7 @@ export default function App() {
         await GoogleSheetsService.syncProducts(token, sheetInfo.spreadsheetId, updatedProducts);
       } catch (err: any) {
         console.error('Failed to sync product to Google Sheets:', err);
-        alert(`คำเตือน: อัปเดตข้อมูลสำเร็จ แต่ไม่สามารถบันทึกลง Google Sheet ได้: ${err.message}`);
+        setDataError(`อัปเดตข้อมูลสำเร็จ แต่ไม่สามารถบันทึกลง Google Sheet ได้: ${err.message}`);
       } finally {
         setIsSyncing(false);
       }
@@ -339,7 +347,7 @@ export default function App() {
         await GoogleSheetsService.syncProducts(token, sheetInfo.spreadsheetId, updatedProducts);
       } catch (err: any) {
         console.error('Failed to sync deletion to Google Sheets:', err);
-        alert(`คำเตือน: ไม่สามารถบันทึกการลบลง Google Sheet: ${err.message}`);
+        setDataError(`ไม่สามารถบันทึกการลบลง Google Sheet: ${err.message}`);
       } finally {
         setIsSyncing(false);
       }
@@ -444,7 +452,7 @@ export default function App() {
   }
 
   if (!user) {
-    return <LoginScreen onLogin={handleLogin} />;
+    return <LoginScreen onLogin={handleLogin} onDemoLogin={handleDemoLogin} />;
   }
 
   return (

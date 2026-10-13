@@ -3,6 +3,7 @@
   "appId": "1:40749357630:web:ff6e256b4f5bed46c3cf6f",
   "apiKey": "AIzaSyB0veZMQ8MbeieLCQzsG-ys5hqdjLjRJqc",
   "authDomain": "gen-lang-client-0003957222.firebaseapp.com",
+  "firestoreDatabaseId": "ai-studio-nproaudio-a64e1cb7-8b11-4232-8ced-33366ccb4b14",
   "storageBucket": "gen-lang-client-0003957222.firebasestorage.app",
   "messagingSenderId": "40749357630",
   "measurementId": "",

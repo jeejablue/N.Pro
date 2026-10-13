@@ -57,6 +57,7 @@ export const StockMasterView: React.FC<StockMasterViewProps> = ({
   const [formImageUrl, setFormImageUrl] = useState('');
   const [isCompressingImg, setIsCompressingImg] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -225,7 +226,8 @@ export const StockMasterView: React.FC<StockMasterViewProps> = ({
       await onDeleteProduct(productToDelete.sku);
       setProductToDelete(null);
     } catch (err: any) {
-      alert(`ไม่สามารถลบสินค้าได้: ${err.message}`);
+      setActionError(`ไม่สามารถลบสินค้าได้: ${err.message}`);
+      setTimeout(() => setActionError(null), 5000);
     } finally {
       setIsDeleting(false);
     }
@@ -233,6 +235,13 @@ export const StockMasterView: React.FC<StockMasterViewProps> = ({
 
   return (
     <div className="space-y-6 pb-20 lg:pb-8">
+      {actionError && (
+        <div className="p-4 bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800/60 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold text-red-800 dark:text-red-200 animate-in fade-in">
+          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+          <span>{actionError}</span>
+        </div>
+      )}
+
       {/* Title & Add Button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

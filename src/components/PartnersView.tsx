@@ -11,7 +11,8 @@ import {
   Phone,
   Mail,
   MapPin,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
 import { ConfirmModal } from './ConfirmModal';
 
@@ -41,6 +42,7 @@ export const PartnersView: React.FC<PartnersViewProps> = ({
   const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string; type: 'supplier' | 'customer' } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Form Fields
   const [formId, setFormId] = useState('');
@@ -158,7 +160,8 @@ export const PartnersView: React.FC<PartnersViewProps> = ({
       }
       setItemToDelete(null);
     } catch (err: any) {
-      alert(`ไม่สามารถลบได้: ${err.message}`);
+      setActionError(`ไม่สามารถลบได้: ${err.message}`);
+      setTimeout(() => setActionError(null), 5000);
     } finally {
       setIsDeleting(false);
     }
@@ -166,6 +169,13 @@ export const PartnersView: React.FC<PartnersViewProps> = ({
 
   return (
     <div className="space-y-6 pb-20 lg:pb-8">
+      {actionError && (
+        <div className="p-4 bg-red-50 dark:bg-red-950/60 border border-red-200 dark:border-red-800/60 rounded-2xl flex items-center gap-3 text-xs sm:text-sm font-semibold text-red-800 dark:text-red-200 animate-in fade-in">
+          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0" />
+          <span>{actionError}</span>
+        </div>
+      )}
+
       {/* Page Title & Add Button */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
